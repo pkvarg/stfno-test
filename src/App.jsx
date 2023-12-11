@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import viteLogo from '/vite.svg';
 import axios from 'axios';
 
 function App() {
   const GITHUB_URL = import.meta.env.VITE_GITHUB_URL;
   const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+
+  // const GITHUB_URL = import.meta.env.VITE_GITHUB_URL;
+  // const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 
   const [userId, setUserId] = useState('pkvarg');
 
@@ -41,32 +43,18 @@ function App() {
     setLoadedRepositories(newLoadedRepositories);
   };
 
-  // const getCommitMessages = async (repoName) => {
-  //   const res = await axios.get(
-  //     `https://api.github.com/repos/${userId}/${repoName}/commits`,
-  //     {
-  //       headers,
-  //     },
-  //   );
-  //   if (res) {
-  //     const commitMessages = res.data
-  //       .slice(0, 3)
-  //       .map((commit) => commit.commit.message);
-  //     return commitMessages;
-  //     console.log('msgs', commitMessages);
-  //   }
-  // };
-
   useEffect(() => {
     repositories.forEach((repo) => {
-      fetch(`https://api.github.com/repos/${userId}/${repo.name}/commits`)
+      fetch(`https://api.github.com/repos/${userId}/${repo.name}/commits`, {
+        headers,
+      })
         .then((response) => response.json())
         .then((data) => {
           const commitMessages = data
             .slice(0, 3)
             .map((commit) => commit.commit.message);
           repo.commitMessages = commitMessages; // Store commit messages in the repository object
-          setRepositories((prevRepos) => [...prevRepos]); // Update the repositories state to trigger a re-render
+          setRepositories((prevRepos) => [...prevRepos]);
         })
         .catch((error) => {
           console.error(error);
@@ -81,26 +69,10 @@ function App() {
       Accept: 'application/vnd.github.v3+json',
       Authorization: `token ${GITHUB_TOKEN}`,
     };
-
-    // const getCommits = async (repoName) => {
-    //   const repoCommits = await axios.get(
-    //     `https://api.github.com/repos/${userId}/${repoName}/commits`,
-
-    //     {
-    //       owner: `${userId}`,
-    //       repo: `${repoName}`,
-    //       headers: {
-    //         'X-GitHub-Api-Version': '2022-11-28',
-    //         Authorization: `token ${GITHUB_TOKEN}`,
-    //       },
-    //     },
-    //   );
-    //   return setCommits(repoCommits);
-    // };
   };
 
   return (
-    <div className="flex h-screen justify-center bg-[#00b92f] text-zinc-900">
+    <div className="flex h-max justify-center bg-[#00b92f] text-zinc-900">
       <div className="mx-16 mt-8 w-[100%] border-2 border-[#ffffff] bg-slate-50">
         <form
           onSubmit={handleSubmit}
@@ -118,35 +90,39 @@ function App() {
             Submit
           </button>
         </form>
-        <div className="mt- mx-2 flex flex-row justify-center  gap-16 text-[#000000]">
+        <div className="mx-2 mt-2 flex flex-row justify-center text-[#000000]">
           <div>
-            <p className="font-bold">Repository</p>
+            <div className="flex flex-row justify-between">
+              <p className="font-bold">Repository</p>
+              <p className="font-bold">Commits</p>
+            </div>
 
             <ul>
               {visibleRepositories.map((repo) => (
-                <li key={repo.id}>
+                <li
+                  key={repo.id}
+                  className="flex justify-between border-b-2 border-[#000000]"
+                >
                   {repo.name}
-                  <ul className="ml-16">
+                  <ul className="text-right">
                     {repo.commitMessages &&
                       repo.commitMessages.map((message, index) => (
-                        <li key={index}>{message}</li>
+                        <li className="ml-24" key={index}>
+                          {message}
+                        </li>
                       ))}
                   </ul>
                 </li>
               ))}
             </ul>
             {loadedRepositories < repositories.length && (
-              <button onClick={loadMoreRepositories}>Load More</button>
+              <button
+                className="my-3 cursor-pointer bg-blue-500 p-1 text-white"
+                onClick={loadMoreRepositories}
+              >
+                Load More
+              </button>
             )}
-          </div>
-          <div>
-            <p className="font-bold">Commits</p>
-            {/* {commits !== undefined &&
-              commits?.data?.map((commit) => (
-                <div key={commit.sha}>
-                  <p>{commit.commit.message}</p>
-                </div>
-              ))} */}
           </div>
         </div>
       </div>
