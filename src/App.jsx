@@ -10,7 +10,6 @@ function App() {
   const [visibleRepositories, setVisibleRepositories] = useState([]);
   const [loadedRepositories, setLoadedRepositories] = useState(10);
 
-
   const loadMoreRepositories = () => {
     const newLoadedRepositories = loadedRepositories + 10;
     setVisibleRepositories(repositories.slice(0, newLoadedRepositories));
@@ -21,7 +20,6 @@ function App() {
     Accept: 'application/vnd.github.v3+json',
     Authorization: `token ${GITHUB_TOKEN}`,
   };
-
 
   useEffect(() => {
     repositories.forEach((repo) => {
@@ -110,7 +108,7 @@ function App() {
                 className="my-3 cursor-pointer bg-blue-500 p-1 text-white"
                 onClick={loadMoreRepositories}
               >
-                Load More
+                Show More
               </button>
             )}
           </div>
