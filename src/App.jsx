@@ -2,46 +2,26 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
-  const GITHUB_URL = import.meta.env.VITE_GITHUB_URL;
   const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 
-  // const GITHUB_URL = import.meta.env.VITE_GITHUB_URL;
-  // const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
-
-  const [userId, setUserId] = useState('pkvarg');
+  const [userId, setUserId] = useState('');
 
   const [repositories, setRepositories] = useState([]);
   const [visibleRepositories, setVisibleRepositories] = useState([]);
   const [loadedRepositories, setLoadedRepositories] = useState(10);
 
-  const headers = {
-    Accept: 'application/vnd.github.v3+json',
-    Authorization: `token ${GITHUB_TOKEN}`,
-  };
-
-  useEffect(() => {
-    try {
-      const getRepos = async () => {
-        const res = await axios.get(
-          `https://api.github.com/users/${userId}/repos`,
-          {
-            headers,
-          },
-        );
-        setRepositories(res.data);
-        setVisibleRepositories(res.data.slice(0, loadedRepositories));
-      };
-      getRepos();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
 
   const loadMoreRepositories = () => {
     const newLoadedRepositories = loadedRepositories + 10;
     setVisibleRepositories(repositories.slice(0, newLoadedRepositories));
     setLoadedRepositories(newLoadedRepositories);
   };
+
+  const headers = {
+    Accept: 'application/vnd.github.v3+json',
+    Authorization: `token ${GITHUB_TOKEN}`,
+  };
+
 
   useEffect(() => {
     repositories.forEach((repo) => {
@@ -64,16 +44,26 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const headers = {
-      Accept: 'application/vnd.github.v3+json',
-      Authorization: `token ${GITHUB_TOKEN}`,
-    };
+    try {
+      const getRepos = async () => {
+        const res = await axios.get(
+          `https://api.github.com/users/${userId}/repos`,
+          {
+            headers,
+          },
+        );
+        setRepositories(res.data);
+        setVisibleRepositories(res.data.slice(0, loadedRepositories));
+      };
+      getRepos();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <div className="flex h-max justify-center bg-[#00b92f] text-zinc-900">
-      <div className="mx-16 mt-8 w-[100%] border-2 border-[#ffffff] bg-slate-50">
+    <div className="flex justify-center border-[25px] border-[#00b92f] text-zinc-900">
+      <div className="w-[100%] border-2 border-[#ffffff]  bg-slate-50 px-16 py-8">
         <form
           onSubmit={handleSubmit}
           className="flex flex-row justify-center gap-4 border-2 py-4"
@@ -84,7 +74,7 @@ function App() {
             className="pl-2"
             value={userId}
             required
-            onChange={(e) => setuserId(e.target.value)}
+            onChange={(e) => setUserId(e.target.value)}
           />
           <button type="submit" className="bg-blue-500 p-2 text-[#ffffff]">
             Submit
@@ -92,7 +82,7 @@ function App() {
         </form>
         <div className="mx-2 mt-2 flex flex-row justify-center text-[#000000]">
           <div>
-            <div className="flex flex-row justify-between">
+            <div className="flex flex-row justify-between gap-24 border-b-2 border-[#000000]">
               <p className="font-bold">Repository</p>
               <p className="font-bold">Commits</p>
             </div>
